@@ -1,0 +1,113 @@
+/* Minimal theme tokens — keeps stories readable without pulling in Tailwind. */
+:root[data-theme='light'],
+:root:not([data-theme]) {
+  --sb-bg: #ffffff;
+  --sb-fg: #0f172a;
+  --sb-muted: #64748b;
+  --sb-border: #e2e8f0;
+  --sb-accent: #0ea5e9;
+  --sb-card: #f8fafc;
+}
+
+:root[data-theme='dark'] {
+  --sb-bg: #0f172a;
+  --sb-fg: #e2e8f0;
+  --sb-muted: #94a3b8;
+  --sb-border: #1e293b;
+  --sb-accent: #38bdf8;
+  --sb-card: #1e293b;
+}
+
+body,
+#storybook-root {
+  background: var(--sb-bg);
+  color: var(--sb-fg);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.sb-side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  min-width: 640px;
+}
+
+.sb-side-by-side > section {
+  padding: 1rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 0.5rem;
+  background: var(--sb-card);
+}
+
+.sb-side-by-side h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sb-muted);
+}
+
+/* Baseline styles for the default-adapter components so stories look decent. */
+.agentui-text--heading {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+.agentui-text--body {
+  margin: 0.25rem 0;
+}
+.agentui-text--caption {
+  color: var(--sb-muted);
+  font-size: 0.85em;
+}
+.agentui-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 0.375rem;
+  background: var(--sb-bg);
+  color: var(--sb-fg);
+  cursor: pointer;
+  font: inherit;
+}
+.agentui-button:hover {
+  border-color: var(--sb-accent);
+}
+.agentui-textfield {
+  display: grid;
+  gap: 0.25rem;
+}
+.agentui-textfield__input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--sb-border);
+  border-radius: 0.375rem;
+  background: var(--sb-bg);
+  color: var(--sb-fg);
+  font: inherit;
+}
+.agentui-card {
+  border: 1px solid var(--sb-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.agentui-card__header {
+  padding: 0.75rem 1rem;
+  background: var(--sb-card);
+  border-bottom: 1px solid var(--sb-border);
+  font-weight: 600;
+}
+.agentui-card__body {
+  padding: 1rem;
+}
+.agentui-placeholder {
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--sb-border);
+  border-radius: 0.375rem;
+  color: var(--sb-muted);
+  font-size: 0.85em;
+}
+.agentui-missing {
+  padding: 0.25rem 0.5rem;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 0.25rem;
+  font-size: 0.85em;
+}
