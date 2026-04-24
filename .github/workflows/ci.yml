@@ -55,3 +55,57 @@ jobs:
 
       - name: Dependency audit
         run: pnpm audit --audit-level=high
+
+  nuxt4-compat:
+    name: Nuxt 4 compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: verify
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # Pin Nuxt 4 across the workspace for this job — peer ranges stay
+      # permissive (^3 || ^4) but we force-resolve to 4.x here so the
+      # module and playground are actually exercised against v4.
+      - name: Force-resolve Nuxt 4
+        run: |
+          node -e "
+          const fs = require('fs');
+          const p = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          p.pnpm = p.pnpm || {};
+          p.pnpm.overrides = {
+            ...(p.pnpm.overrides || {}),
+            nuxt: '^4.4.0',
+            '@nuxt/kit': '^4.4.0',
+            '@nuxt/schema': '^4.4.0',
+          };
+          fs.writeFileSync('package.json', JSON.stringify(p, null, 2));
+          "
+
+      - name: Install dependencies (Nuxt 4)
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Module typecheck
+        run: pnpm --filter @berkantdev/agentui-nuxt typecheck
+
+      - name: Module tests
+        run: pnpm --filter @berkantdev/agentui-nuxt test
+
+      - name: Module build
+        run: pnpm --filter @berkantdev/agentui-nuxt build
+
+      - name: Playground build (Nuxt 4)
+        run: pnpm --filter @berkantdev/agentui-nuxt-playground build

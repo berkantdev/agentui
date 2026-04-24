@@ -36,7 +36,7 @@ export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: MODULE_NAME,
     configKey: 'agentui',
-    compatibility: { nuxt: '^3.0.0' },
+    compatibility: { nuxt: '>=3.13.0' },
   },
   defaults: {
     adapter: 'default',

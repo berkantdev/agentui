@@ -19,7 +19,7 @@ Source of truth:
 [`packages/nuxt/src/module.ts`](https://github.com/berkantdev/agentui/tree/main/packages/nuxt/src/module.ts).
 
 The Nuxt path is covered end-to-end in
-[Getting Started → Nuxt 3](/guide/getting-started#nuxt-3), including
+[Getting Started → Nuxt 3 or 4](/guide/getting-started#nuxt-3-or-4), including
 the `adapter: 'none'` + local plugin pattern for bring-your-own
 component libraries (shadcn-vue, PrimeVue, bespoke design systems).
 :::

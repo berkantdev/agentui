@@ -7,10 +7,10 @@ project and you'll be streaming A2UI surfaces in a minute.
 
 - **Node** 20 or newer
 - **pnpm / npm / yarn** — any modern package manager works
-- **Vue 3.4+** or **Nuxt 3** for the UI bindings
+- **Vue 3.4+** or **Nuxt 3.13+ / Nuxt 4** for the UI bindings
 - An SSE endpoint that speaks A2UI v0.10 (a mock is fine to start)
 
-## Nuxt 3
+## Nuxt 3 or 4
 
 The fastest path — the Nuxt module wires up auto-imports, global
 components, and plugin registration for you.

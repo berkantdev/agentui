@@ -14,7 +14,7 @@
     "@berkantdev/agentui-vue": "workspace:*"
   },
   "devDependencies": {
-    "nuxt": "^3.13.0",
+    "nuxt": "^3.21.2",
     "vue": "^3.4.37"
   }
 }
