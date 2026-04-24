@@ -1,5 +1,5 @@
 export { useSSE } from './useSSE.js'
-export type { SSEStatus, UseSSEOptions, UseSSEReturn } from './useSSE.js'
+export type { SSEStatus, SSEHeaders, SSEError, UseSSEOptions, UseSSEReturn } from './useSSE.js'
 
 export { useSurface } from './useSurface.js'
 export type { UseSurfaceReturn } from './useSurface.js'

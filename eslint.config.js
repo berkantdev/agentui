@@ -51,6 +51,9 @@ export default tseslint.config(
     },
     rules: {
       'vue/multi-word-component-names': 'off',
+      // `?` in <script setup> prop types already encodes optionality — no
+      // default value needed for genuinely-optional props.
+      'vue/require-default-prop': 'off',
       // Formatting rules owned by Prettier — avoid double-formatting conflicts.
       'vue/max-attributes-per-line': 'off',
       'vue/singleline-html-element-content-newline': 'off',

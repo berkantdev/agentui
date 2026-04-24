@@ -1,48 +1,67 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { nextTick } from 'vue'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import A2Surface from '../../src/components/A2Surface.vue'
 import { ADAPTER_INJECTION_KEY } from '../../src/plugin/keys.js'
 import { createDefaultAdapter } from '../../src/adapters/default/index.js'
 
-class MockEventSource {
-  static instances: MockEventSource[] = []
-  url: string
-  onopen: ((ev: Event) => void) | null = null
-  onmessage: ((ev: MessageEvent<string>) => void) | null = null
-  onerror: ((ev: Event) => void) | null = null
+class StreamHandle {
+  controller!: ReadableStreamDefaultController<Uint8Array>
+  readonly stream: ReadableStream<Uint8Array>
   closed = false
+  private readonly encoder = new TextEncoder()
 
-  constructor(url: string) {
-    this.url = url
-    MockEventSource.instances.push(this)
+  constructor(signal: AbortSignal | null | undefined) {
+    this.stream = new ReadableStream<Uint8Array>({
+      start: (c) => {
+        this.controller = c
+      },
+    })
+    signal?.addEventListener('abort', () => this.abort())
   }
-  close() {
+  pushSSE(data: string): void {
+    if (this.closed) return
+    this.controller.enqueue(this.encoder.encode(`data: ${data}\n\n`))
+  }
+  error(e: unknown): void {
+    if (this.closed) return
     this.closed = true
+    try {
+      this.controller.error(e)
+    } catch {
+      /* noop */
+    }
   }
-  emitOpen() {
-    this.onopen?.(new Event('open'))
-  }
-  emitMessage(data: string) {
-    this.onmessage?.(new MessageEvent('message', { data }))
-  }
-  emitError() {
-    this.onerror?.(new Event('error'))
-  }
-  static last(): MockEventSource {
-    const last = MockEventSource.instances.at(-1)
-    if (!last) throw new Error('no EventSource constructed')
-    return last
-  }
-  static reset() {
-    MockEventSource.instances = []
+  abort(): void {
+    this.error(new DOMException('aborted', 'AbortError'))
   }
 }
 
-function mountSurface(url = '/agent') {
+interface Call {
+  url: string
+  headers: Record<string, string>
+  handle: StreamHandle
+}
+const calls: Call[] = []
+let nextStatus = 200
+
+async function mockFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const url = typeof input === 'string' ? input : input.toString()
+  const h = new Headers(init?.headers)
+  const headers: Record<string, string> = {}
+  h.forEach((v, k) => {
+    headers[k] = v
+  })
+  const handle = new StreamHandle(init?.signal ?? null)
+  const status = nextStatus
+  nextStatus = 200
+  calls.push({ url, headers, handle })
+  return new Response(handle.stream, { status, statusText: status === 200 ? 'OK' : 'Err' })
+}
+
+function mountSurface(props: Record<string, unknown> = {}) {
   const adapter = createDefaultAdapter()
   return mount(A2Surface, {
-    props: { url },
+    props: { url: '/agent', ...props },
     global: {
       provide: { [ADAPTER_INJECTION_KEY as symbol]: adapter },
     },
@@ -51,48 +70,64 @@ function mountSurface(url = '/agent') {
 
 describe('A2Surface', () => {
   beforeEach(() => {
-    MockEventSource.reset()
-    vi.stubGlobal('EventSource', MockEventSource)
-    vi.useFakeTimers()
+    calls.length = 0
+    nextStatus = 200
+    vi.stubGlobal('fetch', mockFetch)
   })
   afterEach(() => {
-    vi.useRealTimers()
     vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 
-  it('opens an EventSource for the given url', async () => {
-    const wrapper = mountSurface('/agent/42')
-    await nextTick()
-    expect(MockEventSource.last().url).toBe('/agent/42')
-    expect(wrapper.attributes('data-status')).toBe('connecting')
-    wrapper.unmount()
-  })
-
-  it('flips data-status to "open" when the connection opens', async () => {
-    const wrapper = mountSurface()
-    await nextTick()
-    MockEventSource.last().emitOpen()
-    await nextTick()
+  it('opens a fetch connection to the configured url', async () => {
+    const wrapper = mountSurface({ url: '/agent/42' })
+    await flushPromises()
+    expect(calls).toHaveLength(1)
+    expect(calls[0]!.url).toBe('/agent/42')
     expect(wrapper.attributes('data-status')).toBe('open')
     wrapper.unmount()
   })
 
-  it('parses and renders a full createSurface + updateComponents flow', async () => {
-    const wrapper = mountSurface()
-    await nextTick()
+  it('forwards a static Authorization header', async () => {
+    const wrapper = mountSurface({
+      headers: { Authorization: 'Bearer abc' },
+    })
+    await flushPromises()
+    expect(calls[0]!.headers.authorization).toBe('Bearer abc')
+    wrapper.unmount()
+  })
 
-    const src = MockEventSource.last()
-    src.emitOpen()
-    src.emitMessage(JSON.stringify({ type: 'createSurface', surfaceId: 's1', title: 'Hi' }))
-    src.emitMessage(
+  it('awaits an async headers factory on every connect', async () => {
+    let token = 'first'
+    const factory = vi.fn(async () => ({ Authorization: `Bearer ${token}` }))
+    const wrapper = mountSurface({ headers: factory, initialDelayMs: 10, maxDelayMs: 10 })
+    await flushPromises()
+    expect(calls[0]!.headers.authorization).toBe('Bearer first')
+
+    token = 'second'
+    calls[0]!.handle.error(new Error('drop'))
+    await flushPromises()
+    await new Promise((r) => setTimeout(r, 30))
+    await flushPromises()
+    expect(calls.at(-1)!.headers.authorization).toBe('Bearer second')
+    expect(factory).toHaveBeenCalledTimes(2)
+    wrapper.unmount()
+  })
+
+  it('parses createSurface + updateComponents and renders through the adapter', async () => {
+    const wrapper = mountSurface()
+    await flushPromises()
+
+    const h = calls[0]!.handle
+    h.pushSSE(JSON.stringify({ type: 'createSurface', surfaceId: 's1', title: 'Hi' }))
+    h.pushSSE(
       JSON.stringify({
         type: 'updateComponents',
         surfaceId: 's1',
         components: [{ id: 'a', component: { Text: { text: 'rendered' } } }],
       }),
     )
-    await nextTick()
-
+    await flushPromises()
     expect(wrapper.text()).toContain('rendered')
     wrapper.unmount()
   })
@@ -100,38 +135,39 @@ describe('A2Surface', () => {
   it('silently drops malformed SSE payloads', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const wrapper = mountSurface()
-    await nextTick()
+    await flushPromises()
 
-    MockEventSource.last().emitMessage('{not json')
-    MockEventSource.last().emitMessage('{"type":"nope"}')
-    await nextTick()
-
-    // still no components rendered
+    calls[0]!.handle.pushSSE('{not json')
+    calls[0]!.handle.pushSSE('{"type":"nope"}')
+    await flushPromises()
     expect(wrapper.find('.agentui-missing').exists()).toBe(false)
     warn.mockRestore()
     wrapper.unmount()
   })
 
-  it('closes the EventSource on unmount', async () => {
-    const wrapper = mountSurface()
-    await nextTick()
-    const source = MockEventSource.last()
+  it('emits a typed error event on http failure', async () => {
+    nextStatus = 500
+    const wrapper = mountSurface({ maxRetries: 0 })
+    await flushPromises()
+    const emitted = wrapper.emitted('error')
+    expect(emitted).toBeTruthy()
+    expect(emitted![0]![0]).toMatchObject({ type: 'http', status: 500 })
     wrapper.unmount()
-    expect(source.closed).toBe(true)
   })
 
-  it('emits `open` and `error` events to the parent', async () => {
+  it('emits open when the stream is ready', async () => {
     const wrapper = mountSurface()
-    await nextTick()
-    const src = MockEventSource.last()
-
-    src.emitOpen()
-    await nextTick()
+    await flushPromises()
     expect(wrapper.emitted('open')).toBeTruthy()
-
-    src.emitError()
-    await nextTick()
-    expect(wrapper.emitted('error')).toBeTruthy()
     wrapper.unmount()
+  })
+
+  it('aborts the active fetch on unmount', async () => {
+    const wrapper = mountSurface()
+    await flushPromises()
+    const handle = calls[0]!.handle
+    wrapper.unmount()
+    await flushPromises()
+    expect(handle.closed).toBe(true)
   })
 })
