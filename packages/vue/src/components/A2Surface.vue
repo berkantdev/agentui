@@ -1,4 +1,16 @@
 <script setup lang="ts">
+/**
+ * Live-connected A2UI surface.
+ *
+ * Opens an SSE connection to `url`, parses every incoming message with
+ * {@link parseMessage} and applies it to a local {@link useSurface}
+ * state. Reconnects with exponential backoff on error; exposes
+ * `status`, `error`, and `retries` via `defineExpose` and emits
+ * `open` / `error` / `give-up` events for parent components.
+ *
+ * The `status` slot receives the current connection state so parents
+ * can render their own loading or error chrome.
+ */
 import { computed, toRef } from 'vue'
 import { parseMessage } from '@berkantdev/agentui-core'
 import { useSSE } from '../composables/useSSE.js'

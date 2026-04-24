@@ -1,4 +1,12 @@
 <script setup lang="ts">
+/**
+ * Internal renderer for a single {@link A2UIComponent}.
+ *
+ * Looks up the component type against the active adapter (via
+ * provide/inject) and renders it. Falls back to a visible `.agentui-missing`
+ * marker when no adapter entry exists. Not intended for direct use —
+ * render a surface via `<A2Surface>` or `<A2StaticRenderer>` instead.
+ */
 import { computed } from 'vue'
 import type { A2UIComponent, A2UIComponentType, A2UIDataModel } from '@berkantdev/agentui-core'
 import { useA2UI } from '../composables/useA2UI.js'

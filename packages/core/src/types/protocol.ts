@@ -12,24 +12,28 @@ export type A2UIMessage =
   | A2UIUpdateDataModelMessage
   | A2UIDeleteSurfaceMessage
 
+/** Creates or resets the surface identified by `surfaceId`. */
 export interface A2UICreateSurfaceMessage {
   readonly type: 'createSurface'
   readonly surfaceId: string
   readonly title?: string | undefined
 }
 
+/** Upserts the listed components on the target surface by id. */
 export interface A2UIUpdateComponentsMessage {
   readonly type: 'updateComponents'
   readonly surfaceId: string
   readonly components: readonly A2UIComponent[]
 }
 
+/** Merges the provided key/value pairs into the surface's data model. */
 export interface A2UIUpdateDataModelMessage {
   readonly type: 'updateDataModel'
   readonly surfaceId: string
   readonly data: A2UIDataModel
 }
 
+/** Tears down the surface and clears its components/data model. */
 export interface A2UIDeleteSurfaceMessage {
   readonly type: 'deleteSurface'
   readonly surfaceId: string
