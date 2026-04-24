@@ -7,8 +7,8 @@ useHead({ title: 'AgentUI Playground' })
     <header>
       <h1>AgentUI Nuxt Playground</h1>
       <p>
-        Smoke tests for <code>@berkantdev/agentui-nuxt</code> — module auto-imports, global components,
-        and the default adapter.
+        Smoke tests for <code>@berkantdev/agentui-nuxt</code> — module auto-imports, global
+        components, and the default adapter.
       </p>
     </header>
 
