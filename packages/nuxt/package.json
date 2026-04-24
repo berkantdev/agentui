@@ -1,0 +1,73 @@
+{
+  "name": "@berkantdev/agentui-nuxt",
+  "version": "0.0.0",
+  "description": "Nuxt 3 module for @berkantdev/agentui-vue — auto-imports, global components, plugin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/berkantdev/agentui",
+    "directory": "packages/nuxt"
+  },
+  "type": "module",
+  "main": "./dist/module.mjs",
+  "types": "./dist/types.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/module.mjs",
+      "require": "./dist/module.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "nuxt-module-build build",
+    "prepack": "nuxt-module-build build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "size": "size-limit"
+  },
+  "peerDependencies": {
+    "nuxt": "^3.0.0",
+    "vue": "^3.4.0"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^3.13.0",
+    "@berkantdev/agentui-core": "workspace:*",
+    "@berkantdev/agentui-vue": "workspace:*"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "^0.8.4",
+    "@nuxt/schema": "^3.13.0",
+    "@size-limit/preset-small-lib": "^11.1.4",
+    "@types/node": "^20.14.0",
+    "nuxt": "^3.13.0",
+    "size-limit": "^11.1.4",
+    "vue": "^3.4.37"
+  },
+  "size-limit": [
+    {
+      "name": "Module entry (gzipped, excluding peer deps)",
+      "path": "dist/module.mjs",
+      "limit": "5 KB",
+      "ignore": [
+        "nuxt",
+        "vue",
+        "zod",
+        "@berkantdev/agentui-core",
+        "@berkantdev/agentui-vue",
+        "@nuxt/kit",
+        "@nuxt/schema",
+        "pathe",
+        "ufo",
+        "pkg-types",
+        "defu"
+      ]
+    }
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
