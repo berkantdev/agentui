@@ -9,6 +9,8 @@ coverage
 *.log
 .env
 .env.local
-.vitepress/cache
-.vitepress/dist
+**/.vitepress/cache
+**/.vitepress/dist
 storybook-static
+docs/.nuxt
+packages/nuxt/playground/.data
