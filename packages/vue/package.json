@@ -1,6 +1,6 @@
 {
   "name": "@berkantdev/agentui-vue",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Vue 3 renderer, composables and adapters for the A2UI protocol",
   "license": "MIT",
   "repository": {
