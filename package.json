@@ -1,0 +1,39 @@
+{
+  "name": "agentui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AgentUI — A2UI protocol renderer for Vue and Nuxt",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/berkantdev/agentui"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter \"./packages/*\" build",
+    "test": "pnpm -r --filter \"./packages/*\" test",
+    "typecheck": "pnpm -r --filter \"./packages/*\" typecheck",
+    "lint": "eslint \"packages/**/*.{ts,vue}\" --no-error-on-unmatched-pattern",
+    "format": "prettier --write \"packages/**/*.{ts,vue,json,md}\"",
+    "format:check": "prettier --check \"packages/**/*.{ts,vue,json,md}\"",
+    "size": "pnpm -r --filter \"./packages/*\" size",
+    "changeset": "changeset",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.7",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.9.0",
+    "eslint-plugin-vue": "^9.27.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.0.5",
+    "vue-eslint-parser": "^9.4.3"
+  },
+  "packageManager": "pnpm@10.10.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+.claude
+.nuxt
+.output
+.cache
+.DS_Store
+*.log
+.env
+.env.local
+.vitepress/cache
+.vitepress/dist
+storybook-static
