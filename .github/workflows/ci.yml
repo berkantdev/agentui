@@ -33,6 +33,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Build first — downstream packages resolve @berkantdev/agentui-core
+      # through its `types` / `exports` fields which point into dist/.
+      # Without a build, vue-tsc can't find the core type declarations.
+      - name: Build
+        run: pnpm -r --filter "./packages/*" build
+
       - name: Typecheck
         run: pnpm -r --filter "./packages/*" typecheck
 
@@ -44,9 +50,6 @@ jobs:
 
       - name: Test
         run: pnpm -r --filter "./packages/*" test
-
-      - name: Build
-        run: pnpm -r --filter "./packages/*" build
 
       - name: Bundle budget
         run: pnpm -r --filter "./packages/*" size
@@ -93,6 +96,11 @@ jobs:
 
       - name: Install dependencies (Nuxt 4)
         run: pnpm install --no-frozen-lockfile
+
+      # Core + Vue must be built before the Nuxt module can typecheck or
+      # build against them (same reason as the main `verify` job).
+      - name: Build upstream packages
+        run: pnpm -r --filter "./packages/core" --filter "./packages/vue" build
 
       - name: Module typecheck
         run: pnpm --filter @berkantdev/agentui-nuxt typecheck
