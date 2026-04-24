@@ -1,0 +1,57 @@
+{
+  "name": "@berkantdev/agentui-core",
+  "version": "0.0.0",
+  "description": "Framework-agnostic A2UI protocol types, schemas, and parsers",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/berkantdev/agentui",
+    "directory": "packages/core"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "size": "size-limit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^11.1.4",
+    "@types/node": "^20.14.0",
+    "size-limit": "^11.1.4",
+    "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.0.3"
+  },
+  "size-limit": [
+    {
+      "name": "ESM bundle (gzipped, excluding peer/dep zod)",
+      "path": "dist/index.js",
+      "limit": "8 KB",
+      "ignore": [
+        "zod"
+      ]
+    }
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
