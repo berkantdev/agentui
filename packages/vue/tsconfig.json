@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["vitest/globals", "node"],
+    "jsx": "preserve"
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.vue", "vite.config.ts"],
+  "exclude": ["dist", "node_modules"]
+}

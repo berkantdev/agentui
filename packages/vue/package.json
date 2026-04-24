@@ -1,0 +1,72 @@
+{
+  "name": "@berkantdev/agentui-vue",
+  "version": "0.0.0",
+  "description": "Vue 3 renderer, composables and adapters for the A2UI protocol",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/berkantdev/agentui",
+    "directory": "packages/vue"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./adapters": {
+      "types": "./dist/adapters.d.ts",
+      "import": "./dist/adapters.js",
+      "require": "./dist/adapters.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "vue-tsc --noEmit",
+    "size": "size-limit"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.0"
+  },
+  "dependencies": {
+    "@berkantdev/agentui-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^11.1.4",
+    "@types/node": "^20.14.0",
+    "@vitejs/plugin-vue": "^5.1.0",
+    "@vue/test-utils": "2.4.6",
+    "jsdom": "^25.0.0",
+    "size-limit": "^11.1.4",
+    "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.0.3",
+    "vue": "^3.4.37",
+    "vue-tsc": "^2.0.29"
+  },
+  "size-limit": [
+    {
+      "name": "ESM bundle (gzipped, excluding peer deps)",
+      "path": "dist/index.js",
+      "limit": "15 KB",
+      "ignore": [
+        "vue",
+        "zod",
+        "@berkantdev/agentui-core"
+      ]
+    }
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
